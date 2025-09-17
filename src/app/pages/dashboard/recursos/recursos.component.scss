@@ -1,0 +1,51 @@
+/* Structure */
+table {
+  width: 100%;
+}
+
+.mat-mdc-form-field {
+  font-size: 14px;
+  width: 100%;
+}
+table.mat-mdc-table {
+  background: #fff;
+  color: #222;
+}
+
+.mat-mdc-header-row {
+  background: #e9ecef; /* cinza clarinho */
+  font-weight: 600;
+  color: #000;
+}
+
+.mat-mdc-row {
+  border-bottom: 1px solid #ddd;
+}
+
+.mat-mdc-row:hover {
+  background-color: #f9f9f9;
+}
+/* Fonte padrão das células */
+.mat-mdc-cell {
+  color: #222 !important; /* cor do texto */
+  font-size: 14px;
+}
+
+/* Cabeçalho */
+.mat-mdc-header-cell {
+  color: #000 !important; /* cor da fonte do cabeçalho */
+  font-weight: 600;
+  font-size: 15px;
+}
+
+/* Ícones */
+.mat-icon {
+  color: #0d6efd; /* azul bootstrap */
+  font-size: 20px; /* aumenta o tamanho */
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.mat-icon:hover {
+  color: #dc3545; /* fica vermelho ao passar o mouse */
+}
