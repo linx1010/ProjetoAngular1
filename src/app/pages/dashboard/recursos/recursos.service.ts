@@ -23,8 +23,23 @@ export class RecursosService {
 
   constructor(private http: HttpClient) {}
 
+  // GET all users
   getUsers(): Observable<User[]> {
     return this.http.get<User[]>(this.apiUrl);
   }
-  
+
+  // CREATE a new user
+  createUser(user: Partial<User>): Observable<User> {
+    return this.http.post<User>(this.apiUrl, user);
+  }
+
+  // UPDATE an existing user
+  updateUser(id: number, user: Partial<User>): Observable<User> {
+    return this.http.put<User>(`${this.apiUrl}/${id}`, user);
+  }
+
+  // DELETE a user (opcional)
+  deleteUser(id: number): Observable<User> {
+    return this.http.delete<User>(`${this.apiUrl}/${id}`);
+  }
 }

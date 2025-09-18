@@ -1,0 +1,21 @@
+.calendar-container {
+  margin: 20px;
+}
+
+.btn-group {
+  margin-bottom: 15px;
+}
+
+button {
+  margin-right: 8px;
+  padding: 6px 12px;
+  border-radius: 5px;
+  border: none;
+  background: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #0056b3;
+}

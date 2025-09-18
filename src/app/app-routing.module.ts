@@ -4,7 +4,7 @@ import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { RecursosComponent } from './pages/dashboard/recursos/recursos.component';
 import { ClientesComponent } from './pages/dashboard/clientes/clientes.component';
 import { ProjetosComponent } from './pages/dashboard/projetos/projetos.component';
-
+import {CalendarComponent} from './pages/dashboard/calendar/calendar.component'
 export const routes: Routes = [
   { path: '', component: LoginComponent },
   {
@@ -14,6 +14,7 @@ export const routes: Routes = [
       { path: 'recursos', component: RecursosComponent },
       { path: 'clientes', component: ClientesComponent },
       { path: 'projetos', component: ProjetosComponent },
+      { path: 'calendar', component: CalendarComponent },
       { path: '', redirectTo: 'recursos', pathMatch: 'full' }
     ]
   },

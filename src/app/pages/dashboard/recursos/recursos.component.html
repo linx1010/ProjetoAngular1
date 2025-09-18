@@ -5,11 +5,47 @@
 
 
 
-<!-- Campo de filtro -->
-<mat-form-field appearance="outline">
-  <mat-label>Filtro</mat-label>
-  <input matInput (keyup)="applyFilter($event)" placeholder="Ex.: João" #input>
-</mat-form-field>
+<!-- Campo de filtro + botão -->
+<div class="toolbar">
+  <button mat-icon-button color="primary" (click)="toggleCadastro()">
+    <mat-icon>person_add</mat-icon>
+  </button>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Filtro</mat-label>
+    <input matInput class="filter" (keyup)="applyFilter($event)"  #input>
+  </mat-form-field>
+</div>
+
+<!-- Formulário de Cadastro Inline -->
+<div *ngIf="showCadastro" class="cadastro-container">
+  <form #form="ngForm" (ngSubmit)="salvarCadastro()">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nome</mat-label>
+      <input matInput [(ngModel)]="novoUser.name" name="name" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Email</mat-label>
+      <input matInput [(ngModel)]="novoUser.email" name="email" required type="email">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Função</mat-label>
+      <input matInput [(ngModel)]="novoUser.role" name="role">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Valor-Hora</mat-label>
+      <input matInput [(ngModel)]="novoUser.hourly_rate" name="hourly_rate" type="number">
+    </mat-form-field>
+
+    <div class="actions">
+      <button mat-button type="button" (click)="cancelarCadastro()">Cancelar</button>
+      <button mat-flat-button color="primary" type="submit">Salvar</button>
+    </div>
+  </form>
+</div>
 
 <!-- Tabela Angular Material -->
 <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
@@ -57,8 +93,11 @@
     <button mat-icon-button color="accent" (click)="visualizar(user)">
       <mat-icon>search</mat-icon>
     </button>
-    <button mat-icon-button color="warn" (click)="excluir(user)">
-      <mat-icon>delete</mat-icon>
+    <button mat-icon-button color="accent" (click)="atualizar(user)">
+      <mat-icon>edit</mat-icon>
+    </button>
+    <button mat-icon-button color="warn" (click)="inativar(user)">
+      <mat-icon>{{ user.active ? 'person_off' : 'person' }}</mat-icon>
     </button>
   </td>
 </ng-container>
