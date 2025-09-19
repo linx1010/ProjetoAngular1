@@ -117,10 +117,13 @@ export class RecursosComponent implements OnInit {
       });
     } else {
       // mantém a criação simulada
-      const novo = { ...this.novoUser, id: this.users.length + 1 };
-      this.users.push(novo);
-      this.dataSource.data = [...this.users];
-      this.cancelarCadastro();
+      this.recursosService.createUser(this.novoUser).subscribe({
+        next: (usuarioCriado) => {
+          this.loadUsers();        // recarrega tabela
+          this.cancelarCadastro(); // fecha formulário
+        },
+        error: (err) => console.error('Erro ao criar usuário', err)
+      });
     }
   }
 

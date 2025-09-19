@@ -40,17 +40,23 @@ async function sendRpcMessage(message) {
 
 // Rotas REST
 app.get("/users", async (req, res) => {
-  const response = await sendRpcMessage({ action: "read" });
+  const response = await sendRpcMessage({ 
+    source: "users",
+    action: "read" });
   res.json(response);
 });
 
 app.post("/users", async (req, res) => {
-  const response = await sendRpcMessage({ action: "create", data: req.body });
+  const response = await sendRpcMessage({ 
+    source: "users",
+    action: "create", data: req.body });
   res.json(response);
 });
 
 app.put("/users/:id", async (req, res) => {
   const response = await sendRpcMessage({
+    
+    source: "users",
     action: "update",
     data: { id: parseInt(req.params.id), ...req.body },
   });
@@ -59,6 +65,8 @@ app.put("/users/:id", async (req, res) => {
 
 app.delete("/users/:id", async (req, res) => {
   const response = await sendRpcMessage({
+    
+    source: "users",
     action: "delete",
     data: { id: parseInt(req.params.id) },
   });
