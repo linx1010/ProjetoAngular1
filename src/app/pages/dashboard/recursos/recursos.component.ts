@@ -82,6 +82,7 @@ export class RecursosComponent implements OnInit {
     email: '',
     role: '',
     hourly_rate: null,
+    organization_id:'1',
     active: true
   };
 
@@ -134,6 +135,7 @@ export class RecursosComponent implements OnInit {
       email: '',
       role: '',
       hourly_rate: null,
+      organization_id:'1',
       active: true
     };
   }

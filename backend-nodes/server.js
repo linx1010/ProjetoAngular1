@@ -38,7 +38,7 @@ async function sendRpcMessage(message) {
   });
 }
 
-// Rotas REST
+// Rotas REST users
 app.get("/users", async (req, res) => {
   const response = await sendRpcMessage({ 
     source: "users",
@@ -72,6 +72,16 @@ app.delete("/users/:id", async (req, res) => {
   });
   res.json(response);
 });
+
+
+// Rotas REST clients
+app.get("/clients", async (req, res) => {
+  const response = await sendRpcMessage({ 
+    source: "clients",
+    action: "read" });
+  res.json(response);
+});
+
 
 // Inicializa conexão RabbitMQ e servidor
 async function start() {
