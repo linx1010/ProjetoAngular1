@@ -110,6 +110,27 @@ app.delete("/clients/:id", async (req, res) => {
 });
 
 
+//Rotas Calendar
+app.get("/calendar", async (req, res) => {
+  const origType = req.query.type; // 'cliente' ou 'recurso'
+  const clientId = parseInt(req.query.id);
+
+  if (!origType || isNaN(clientId)) {
+    return res.status(400).json({ error: "Parâmetros 'type' e 'id' são obrigatórios" });
+  }
+
+  const response = await sendRpcMessage({ 
+    source: "calendar",
+    action: "read",
+    data: { 
+      type: origType,
+      id: clientId
+    }
+  });
+
+  res.json(response);
+});
+
 
 // Inicializa conexão RabbitMQ e servidor
 async function start() {
