@@ -8,6 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { Router } from '@angular/router';
 
 import { ClientsService, Client } from './clientes.service';
 
@@ -44,7 +45,8 @@ export class ClientesComponent implements OnInit {
 
   constructor(
     private clientsService: ClientsService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -124,6 +126,9 @@ export class ClientesComponent implements OnInit {
       width: '400px',
       data: client
     });
+  }
+  abrirCalendario(client:Client):void{
+    this.router.navigate(['/dashboard/calendar','client',client.id])
   }
 
   deletar(client: Client): void {

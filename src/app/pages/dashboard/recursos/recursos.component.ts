@@ -117,7 +117,7 @@ export class RecursosComponent implements OnInit {
         error: (err) => console.error('Erro ao atualizar usuário', err)
       });
     } else {
-      // mantém a criação simulada
+      // Cadastro novo
       this.recursosService.createUser(this.novoUser).subscribe({
         next: (usuarioCriado) => {
           this.loadUsers();        // recarrega tabela

@@ -82,6 +82,34 @@ app.get("/clients", async (req, res) => {
   res.json(response);
 });
 
+app.post("/clients", async (req, res) => {
+  const response = await sendRpcMessage({ 
+    source: "clients",
+    action: "create", data: req.body });
+  res.json(response);
+});
+
+app.put("/clients/:id", async (req, res) => {
+  const response = await sendRpcMessage({
+    
+    source: "clients",
+    action: "update",
+    data: { id: parseInt(req.params.id), ...req.body },
+  });
+  res.json(response);
+});
+
+app.delete("/clients/:id", async (req, res) => {
+  const response = await sendRpcMessage({
+    
+    source: "clients",
+    action: "delete",
+    data: { id: parseInt(req.params.id) },
+  });
+  res.json(response);
+});
+
+
 
 // Inicializa conexão RabbitMQ e servidor
 async function start() {

@@ -14,7 +14,7 @@ export const routes: Routes = [
       { path: 'recursos', component: RecursosComponent },
       { path: 'clientes', component: ClientesComponent },
       { path: 'projetos', component: ProjetosComponent },
-      { path: 'calendar', component: CalendarComponent },
+      { path: 'calendar/:tipo/:id', component: CalendarComponent },
       { path: '', redirectTo: 'recursos', pathMatch: 'full' }
     ]
   },

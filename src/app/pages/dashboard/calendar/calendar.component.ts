@@ -1,132 +1,102 @@
 import { Component } from '@angular/core';
-import { CommonModule, DatePipe, NgSwitch, NgSwitchCase } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import {
-  CalendarEvent,
-  CalendarView,
-  CalendarMonthModule,
-  CalendarWeekModule,
-  CalendarDayModule,
-} from 'angular-calendar';
-import { Subject } from 'rxjs';
+import { CommonModule, DatePipe } from '@angular/common';
+import { FormsModule} from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+
+
 
 @Component({
-  selector: 'app-calendar',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    DatePipe,
-    NgSwitch,
-    NgSwitchCase,
-    CalendarMonthModule,
-    CalendarWeekModule,
-    CalendarDayModule,
-  ],
-  templateUrl: './calendar.component.html',
+  selector: 'app-root',
+  templateUrl: 'calendar.component.html',
+  standalone:true,
+  imports:[CommonModule, DatePipe, FormsModule],
+  styleUrls: ['calendar.component.scss']
 })
+
+
 export class CalendarComponent {
-  // Views
-  CalendarView = CalendarView;
-  view: CalendarView = CalendarView.Month;
+  currentDate = new Date();
+  days: any[] = [];
+  events: { [key: string]: string[] } = {
+    '2025-09-22': ['Reunião com equipe'],
+    '2025-09-25': ['Entrega do projeto']
+  };
+  
+  tipo: string = '';
+  id: number = 0;
+  constructor(private route: ActivatedRoute){}
 
-  // Data
-  viewDate: Date = new Date();
-  events: CalendarEvent[] = [
-    {
-      start: new Date(),
-      end: new Date(),
-      title: 'Evento inicial',
-      color: { primary: '#1e90ff', secondary: '#D1E8FF' },
-    },
-  ];
+  ngOnInit() {
+    this.tipo = this.route.snapshot.paramMap.get('tipo')!;
+    this.id = +this.route.snapshot.paramMap.get('id')!;
 
-  // Helpers
-  refresh = new Subject<void>();
-  activeDayIsOpen: boolean = true;
-  modalData: { action: string; event: CalendarEvent } | undefined;
-
-  // Navegação
-  setView(view: CalendarView) {
-    this.view = view;
+  if (this.tipo === 'cliente') {
+    // buscar agenda do cliente
+    console.log('busca agenda cliente')
+  } else if (this.tipo === 'recurso') {
+    // buscar agenda do recurso
+    console.log('busca agenda cliente')
+  
+  } 
+    this.generateCalendar();
   }
 
-  goToToday() {
-    this.viewDate = new Date();
-  }
+  generateCalendar() {
+    this.days = [];
+    const year = this.currentDate.getFullYear();
+    const month = this.currentDate.getMonth();
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  goToNext() {
-    if (this.view === CalendarView.Month) {
-      this.viewDate = new Date(this.viewDate.setMonth(this.viewDate.getMonth() + 1));
-    } else if (this.view === CalendarView.Week) {
-      this.viewDate = new Date(this.viewDate.setDate(this.viewDate.getDate() + 7));
-    } else {
-      this.viewDate = new Date(this.viewDate.setDate(this.viewDate.getDate() + 1));
+    for (let i = 0; i < firstDay; i++) {
+      this.days.push({ day: null });
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      this.days.push({
+        day,
+        events: this.events[dateKey] || []
+      });
     }
   }
 
-  goToPrevious() {
-    if (this.view === CalendarView.Month) {
-      this.viewDate = new Date(this.viewDate.setMonth(this.viewDate.getMonth() - 1));
-    } else if (this.view === CalendarView.Week) {
-      this.viewDate = new Date(this.viewDate.setDate(this.viewDate.getDate() - 7));
-    } else {
-      this.viewDate = new Date(this.viewDate.setDate(this.viewDate.getDate() - 1));
+  prevMonth() {
+    const year = this.currentDate.getFullYear();
+    const month = this.currentDate.getMonth();
+    this.currentDate = new Date(year, month - 1, 1);
+    this.generateCalendar();
+  }
+
+nextMonth() {
+    const year = this.currentDate.getFullYear();
+    const month = this.currentDate.getMonth();
+    this.currentDate = new Date(year, month + 1, 1);
+    this.generateCalendar();
+  }
+  selectedDay: { day: number, events: string[] } | null = null;
+
+  onDayClick(day: any) {
+    if (day.day) {
+      this.selectedDay = day;
     }
   }
+  newEvent: string = '';
 
-  // Eventos do calendário
-  dayClicked(event: { date: Date; events: CalendarEvent[] }): void {
-    if (this.view === CalendarView.Month) {
-      if (
-        (this.activeDayIsOpen && event.date.getTime() === this.viewDate.getTime()) ||
-        event.events.length === 0
-      ) {
-        this.activeDayIsOpen = false;
-      } else {
-        this.activeDayIsOpen = true;
-        this.viewDate = event.date;
-      }
+addEvent() {
+  if (this.selectedDay && this.newEvent.trim()) {
+    this.selectedDay.events.push(this.newEvent.trim());
+    const year = this.currentDate.getFullYear();
+    const month = this.currentDate.getMonth() + 1;
+    const day = this.selectedDay.day;
+    const dateKey = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+    if (!this.events[dateKey]) {
+      this.events[dateKey] = [];
     }
+    this.events[dateKey].push(this.newEvent.trim());
+    this.newEvent = '';
   }
+}
 
-  eventTimesChanged({
-    event,
-    newStart,
-    newEnd,
-  }: {
-    event: CalendarEvent;
-    newStart: Date;
-    newEnd?: Date;
-  }): void {
-    event.start = newStart;
-    if (newEnd) {
-      event.end = newEnd;
-    }
-    this.refresh.next();
-  }
-
-  handleEvent(action: string, event: CalendarEvent): void {
-    this.modalData = { event, action };
-  }
-
-  addEvent(): void {
-    this.events = [
-      ...this.events,
-      {
-        title: 'Novo evento',
-        start: new Date(),
-        end: new Date(),
-        color: { primary: '#ad2121', secondary: '#FAE3E3' },
-      },
-    ];
-  }
-
-  deleteEvent(eventToDelete: CalendarEvent) {
-    this.events = this.events.filter((event) => event !== eventToDelete);
-  }
-
-  trackByEvent(index: number, event: CalendarEvent): string {
-    return event.title + event.start?.toISOString();
-  }
 }

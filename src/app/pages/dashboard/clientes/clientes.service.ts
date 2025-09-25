@@ -31,19 +31,14 @@ export class ClientsService {
     });
   }
 
-  updateClient(client: Client): Observable<any> {
-    return this.http.put<any>(this.apiUrl, {
-      source: 'clients',
-      action: 'update',
-      data: client
-    });
-  }
+updateClient(client: Client): Observable<any> {
+  return this.http.put<any>(`${this.apiUrl}/${client.id}`, client);
+}
 
-  deleteClient(id: number): Observable<any> {
-    return this.http.post<any>(this.apiUrl, {
-      source: 'clients',
-      action: 'delete',
-      data: { id }
-    });
-  }
+
+ 
+  // DELETE a user (opcional)
+    deleteClient(id: number): Observable<Client> {
+      return this.http.delete<Client>(`${this.apiUrl}/${id}`);
+    }
 }
