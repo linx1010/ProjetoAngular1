@@ -131,6 +131,19 @@ app.get("/calendar", async (req, res) => {
   res.json(response);
 });
 
+app.post("/calendar", async (req, res) => {
+  const response = await sendRpcMessage({ 
+    source: "calendar",
+    action: "create", data: req.body });
+  res.json(response);
+});
+app.delete("/calendar", async (req, res) => {
+  const response = await sendRpcMessage({ 
+    source: "calendar",
+    action: "delete", data: req.body });
+  res.json(response);
+});
+
 
 // Inicializa conexão RabbitMQ e servidor
 async function start() {
