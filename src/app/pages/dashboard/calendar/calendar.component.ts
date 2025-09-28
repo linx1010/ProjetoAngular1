@@ -49,7 +49,7 @@ export class CalendarComponent {
         this.events[dateKey].push(descricao);
       });
 
-      this.generateCalendar(); // ✅ Agora sim, com os dados prontos
+      this.generateCalendar(); 
     });
   }
 

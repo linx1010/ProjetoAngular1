@@ -11,6 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle'; // para o toggle
+import { Router } from '@angular/router';
 
 
 // ⭐ Mini componente do Dialog
@@ -39,7 +40,9 @@ export class RecursosDialog {
   ]
 })
 export class RecursosFormDialog {
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any) {}
+  constructor(
+    @Inject(MAT_DIALOG_DATA) public data: any,
+) {}
 }
 
 
@@ -85,6 +88,7 @@ export class RecursosComponent implements OnInit {
     organization_id:'1',
     active: true
   };
+  
 
   toggleCadastro() {
     this.showCadastro = !this.showCadastro;
@@ -143,7 +147,11 @@ export class RecursosComponent implements OnInit {
 
   dataSource = new MatTableDataSource<User>([]);
 
-  constructor(private recursosService: RecursosService, private dialog: MatDialog) {}
+  constructor(
+    private recursosService: RecursosService, 
+    private dialog: MatDialog,
+    private router:Router
+  ) {}
 
   ngOnInit() {
     this.loadUsers();
@@ -170,8 +178,13 @@ export class RecursosComponent implements OnInit {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
-  abrirCalendario(user: User) {
-    console.log('Abrir calendário para:', user);
+  // abrirCalendario(user: User) {
+  //   console.log('Abrir calendário para:', user);
+  // }
+
+  abrirCalendario(user:User):void{
+    console.log('/dashboard/calendar','user',user.id)
+    this.router.navigate(['/dashboard/calendar','user',user.id])
   }
 
   visualizar(user: User) {
