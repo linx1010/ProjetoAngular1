@@ -18,4 +18,21 @@ export class CalendarService {
       })
     );
   }
+  createAgenda(
+    payload: {
+      type: string;
+      id: number;
+      date: string;
+      title: string;
+      description: string;
+      user_id: number[];
+    }): Observable<any> {
+    return this.http.post<any>(this.apiUrl, payload).pipe(
+      catchError(err => {
+        console.error('Erro ao criar agenda:', err);
+        return of(null);
+      })
+    );
+  }
+
 }

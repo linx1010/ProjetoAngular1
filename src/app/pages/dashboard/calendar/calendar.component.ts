@@ -1,9 +1,16 @@
 import { Component } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { FormsModule} from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import {HttpClientModule, HttpClient} from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { CalendarService } from './calendar.service';
+import {  MatTableModule } from '@angular/material/table';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { RecursosService } from '../recursos/recursos.service';
+import { MatSelectModule } from '@angular/material/select';
 
 
 
@@ -11,50 +18,79 @@ import { CalendarService } from './calendar.service';
 @Component({
   selector: 'app-root',
   templateUrl: 'calendar.component.html',
-  standalone:true,
-  imports:[CommonModule, DatePipe, FormsModule, HttpClientModule],
+  standalone: true,
+  imports: [
+    CommonModule, 
+    DatePipe, 
+    FormsModule, 
+    HttpClientModule,
+    MatIconModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatTableModule,
+    MatSelectModule
+  ],
   styleUrls: ['calendar.component.scss']
 })
 
-
 export class CalendarComponent {
-  currentDate = new Date();
-  days: any[] = [];
-  // events: { [key: string]: string[] } = {
-  //   '2025-09-22': ['Reunião com equipe'],
-  //   '2025-09-25': ['Entrega do projeto']
-  // };
-  events: { [key: string]: string[] } = {}; 
-  
-  tipo: string = '';
-  id: number = 0;
-  constructor(private route: ActivatedRoute, private calendarService: CalendarService){}
+  formEvento = {
+  title: '',
+  description: '',
+  user_id: [] as number[]
+};
+
+  recursos: any[] = []; // Lista de usuários disponíveis
+  currentDate = new Date(); // 📅 Data atual usada para navegação mensal
+  days: any[] = [];         // 🗓️ Dias do mês com eventos agrupados
+  events: { [key: string]: any[] } = {}; // 📦 Eventos agrupados por data (YYYY-MM-DD)
+
+  tipo: string = '';        // 🔍 Tipo da agenda ('client' ou 'user')
+  id: number = 0;           // 🧾 ID do cliente ou usuário
+  selectedDay: { day: number, events: any[] } | null = null; // 📌 Dia selecionado para exibir detalhes
+  newEvent: string = '';    // 📝 Título do novo evento
+
+  constructor(
+    private route: ActivatedRoute,
+    private calendarService: CalendarService,
+    private recursosService: RecursosService
+  ) {}
 
   ngOnInit() {
+    // 🔄 Captura os parâmetros da rota
     this.tipo = this.route.snapshot.paramMap.get('tipo')!;
     this.id = +this.route.snapshot.paramMap.get('id')!;
-    
-    this.carregarAgenda();
+    this.carregarAgenda(); // 🚀 Carrega os eventos da agenda
   }
+
   carregarAgenda() {
     this.calendarService.getAgenda(this.tipo, this.id).subscribe(agenda => {
-      this.events = {};
+      this.events = {}; // 🔄 Reseta os eventos
 
       agenda.forEach(evento => {
         if (!evento.start_time) return;
-
         const dateKey = this.formatDateKey(evento.start_time);
+
         if (!this.events[dateKey]) this.events[dateKey] = [];
-        const descricao = `${evento.title}${evento.location ? ' @ ' + evento.location : ''}`;
-        this.events[dateKey].push(descricao);
+        this.events[dateKey].push(evento); // ✅ Salva o objeto completo
       });
 
-      this.generateCalendar(); 
+      this.generateCalendar(); // 🧠 Gera os dias do mês com eventos
     });
+    this.recursosService.getUsers().subscribe({
+      next: (data) => {
+        this.recursos = data; // ✅ lista de usuários para seleção
+      },
+      error: (err) => {
+        console.error('Erro ao carregar recursos:', err);
+      }
+    });
+
   }
 
   formatDateKey(dateTime: string): string {
-    return dateTime.split(' ')[0];
+    return dateTime.split(' ')[0]; // 🔧 Extrai apenas a data (YYYY-MM-DD)
   }
 
   generateCalendar() {
@@ -65,14 +101,14 @@ export class CalendarComponent {
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
     for (let i = 0; i < firstDay; i++) {
-      this.days.push({ day: null });
+      this.days.push({ day: null }); // 🕳️ Espaços vazios antes do primeiro dia
     }
 
     for (let day = 1; day <= daysInMonth; day++) {
       const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       this.days.push({
         day,
-        events: this.events[dateKey] || []
+        events: this.events[dateKey] || [] // 📌 Eventos do dia
       });
     }
   }
@@ -80,39 +116,76 @@ export class CalendarComponent {
   prevMonth() {
     const year = this.currentDate.getFullYear();
     const month = this.currentDate.getMonth();
-    this.currentDate = new Date(year, month - 1, 1);
+    this.currentDate = new Date(year, month - 1, 1); // ◀ Mês anterior
     this.carregarAgenda();
   }
 
-nextMonth() {
+  nextMonth() {
     const year = this.currentDate.getFullYear();
     const month = this.currentDate.getMonth();
-    this.currentDate = new Date(year, month + 1, 1);
+    this.currentDate = new Date(year, month + 1, 1); // ▶ Próximo mês
     this.carregarAgenda();
   }
-  selectedDay: { day: number, events: string[] } | null = null;
 
   onDayClick(day: any) {
     if (day.day) {
-      this.selectedDay = day;
+      this.selectedDay = day; // 📌 Seleciona o dia para exibir detalhes
     }
   }
-  newEvent: string = '';
 
-addEvent() {
-  if (this.selectedDay && this.newEvent.trim()) {
-    this.selectedDay.events.push(this.newEvent.trim());
+  
+  submitEvento() {
+    if (!this.selectedDay || !this.formEvento.title.trim()) return;
+
     const year = this.currentDate.getFullYear();
     const month = this.currentDate.getMonth() + 1;
     const day = this.selectedDay.day;
-    const dateKey = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const date = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
-    if (!this.events[dateKey]) {
-      this.events[dateKey] = [];
-    }
-    this.events[dateKey].push(this.newEvent.trim());
-    this.newEvent = '';
-  }
+    const payload = {
+      type: 'client',
+      id: this.id,
+      date,
+      title: this.formEvento.title,
+      description: this.formEvento.description,
+      user_id: this.formEvento.user_id
+    };
+
+    this.calendarService.createAgenda(payload).subscribe({
+      next: () => {
+        this.carregarAgenda();
+
+        // Atualiza a tabela de eventos do dia selecionado
+        const diaAtualizado = this.days.find(d => d.day === day);
+        if (diaAtualizado) {
+          this.selectedDay = diaAtualizado;
+        }
+      },
+      error: (err) => {
+        console.error('Erro ao criar agenda:', err);
+      }
+    });
+
+    this.formEvento = { title: '', description: '', user_id: [] };
 }
 
+
+  visualizarEvento(e: any) {
+    alert(`📋 Detalhes do evento:\nTítulo: ${e.title}\nData: ${e.start_time}\nLocal: ${e.location || 'N/A'}`);
+  }
+
+  concluirEvento(e: any) {
+    alert(`✅ Evento "${e.title}" marcado como concluído.`);
+    // Aqui você pode implementar lógica para atualizar status no backend
+  }
+
+  excluirEvento(e: any) {
+  //   if (confirm(`🗑️ Deseja excluir o evento "${e.title}"?`)) {
+  //     this.calendarService.deleteEvento('client', this.id, this.formatDateKey(e.start_time), e.title).subscribe({
+  //       next: () => this.carregarAgenda(), // 🔄 Atualiza após exclusão
+  //       error: (err) => console.error('Erro ao excluir evento:', err)
+  //     });
+  //   }
+   alert(`✅ Evento "${e.title}" marcado para deletar.`);
+   }
 }

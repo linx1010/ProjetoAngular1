@@ -1,37 +1,120 @@
-<!-- Cabeçalho do calendário -->
+<!-- 📅 Cabeçalho do calendário -->
 <div class="calendar-header">
   <button (click)="prevMonth()">◀</button>
   <h2>{{ currentDate | date: 'MMMM - yyyy' }}</h2>
   <button (click)="nextMonth()">▶</button>
 </div>
 
-<!-- Grade do calendário -->
+<!-- 🗓️ Grade do calendário -->
 <div class="calendar-grid">
   <div class="day" *ngFor="let d of days" (click)="onDayClick(d)">
     <div *ngIf="d.day">
       <strong>{{ d.day }}</strong>
-      <div class="event" *ngFor="let e of d.events">{{ e }}</div>
+
+      <!-- 📌 Eventos do dia -->
+      <div class="event" *ngFor="let e of d.events">
+        <strong>{{ e.title }}</strong>
+        <span *ngIf="e.location">📍 {{ e.location }}</span>
+
+      </div>
     </div>
   </div>
 </div>
 
-<!-- Detalhes do dia selecionado -->
+<!-- 📋 Detalhes do dia selecionado -->
 <div class="day-details" *ngIf="selectedDay">
   <h3>Eventos do dia {{ selectedDay.day }}:</h3>
 
   <div *ngIf="selectedDay.events.length > 0; else noEvents">
-    <ul>
-      <li *ngFor="let e of selectedDay.events">{{ e }}</li>
-    </ul>
-  </div>
+  <table mat-table [dataSource]="selectedDay.events" class="event-table" *ngIf="selectedDay.events.length > 0">
 
+  <!-- Título -->
+  <ng-container matColumnDef="title">
+    <th mat-header-cell *matHeaderCellDef>Título</th>
+    <td mat-cell *matCellDef="let e">{{ e.title }}</td>
+  </ng-container>
+
+  <!-- Hora Início -->
+  <ng-container matColumnDef="start_time">
+    <th mat-header-cell *matHeaderCellDef>Início</th>
+    <td mat-cell *matCellDef="let e">{{ e.start_time | date: 'shortTime' }}</td>
+  </ng-container>
+
+  <!-- Hora Fim -->
+  <ng-container matColumnDef="end_time">
+    <th mat-header-cell *matHeaderCellDef>Fim</th>
+    <td mat-cell *matCellDef="let e">
+      {{ e.end_time ? (e.end_time | date: 'shortTime') : '—' }}
+    </td>
+  </ng-container>
+
+  <!-- Localização -->
+  <ng-container matColumnDef="location">
+    <th mat-header-cell *matHeaderCellDef>Local</th>
+    <td mat-cell *matCellDef="let e">{{ e.location || '—' }}</td>
+  </ng-container>
+
+  <!-- Ações -->
+  <ng-container matColumnDef="actions">
+    <th mat-header-cell *matHeaderCellDef>Ações</th>
+    <td mat-cell *matCellDef="let e">
+      <button mat-icon-button color="primary" (click)="visualizarEvento(e)" matTooltip="Visualizar">
+        <mat-icon>visibility</mat-icon>
+      </button>
+
+      <button mat-icon-button color="accent" (click)="concluirEvento(e)" matTooltip="Concluir">
+        <mat-icon>check_circle</mat-icon>
+      </button>
+
+      <button mat-icon-button color="warn"
+              *ngIf="tipo === 'client'"
+              [disabled]="e.end_time"
+              (click)="excluirEvento(e)"
+              matTooltip="Excluir (desabilitado se concluído)">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </td>
+  </ng-container>
+
+  <!-- Cabeçalho e linhas -->
+  <tr mat-header-row *matHeaderRowDef="['title', 'start_time', 'end_time', 'location', 'actions']"></tr>
+  <tr mat-row *matRowDef="let row; columns: ['title', 'start_time', 'end_time', 'location', 'actions']"></tr>
+</table>
+</div>
+
+  <!-- 🔕 Caso não haja eventos -->
   <ng-template #noEvents>
     <p>Não há eventos para este dia.</p>
   </ng-template>
 
-  <!-- Formulário para adicionar evento -->
-  <div class="add-event">
-    <input [(ngModel)]="newEvent" placeholder="Novo evento..." />
-    <button (click)="addEvent()">Adicionar</button>
-  </div>
+ <!-- ➕ Formulário para adicionar evento -->
+<div class="add-event" *ngIf="tipo === 'client'">
+  <h4>Adicionar novo evento</h4>
+
+  <form (ngSubmit)="submitEvento()" #eventoForm="ngForm">
+    <!-- Título -->
+    <mat-form-field appearance="fill">
+      <mat-label>Título</mat-label>
+      <input matInput [(ngModel)]="formEvento.title" name="title" required />
+    </mat-form-field>
+
+    <!-- Descrição -->
+    <mat-form-field appearance="fill">
+      <mat-label>Descrição</mat-label>
+      <textarea matInput [(ngModel)]="formEvento.description" name="description"></textarea>
+    </mat-form-field>
+
+    <!-- Participantes -->
+    <mat-form-field appearance="fill">
+      <mat-label>Participantes</mat-label>
+      <mat-select [(ngModel)]="formEvento.user_id" name="user_id" multiple>
+        <mat-option *ngFor="let u of recursos" [value]="u.id">{{ u.name }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <!-- Botão -->
+    <button mat-raised-button color="primary" type="submit" [disabled]="!eventoForm.form.valid">
+      Adicionar Evento
+    </button>
+  </form>
 </div>
