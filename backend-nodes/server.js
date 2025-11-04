@@ -137,6 +137,13 @@ app.post("/calendar", async (req, res) => {
     action: "create", data: req.body });
   res.json(response);
 });
+app.put("/calendar", async (req, res) => {
+  const response = await sendRpcMessage({ 
+    source: "calendar",
+    action: "update", data: req.body });
+  res.json(response);
+});
+
 app.delete("/calendar", async (req, res) => {
   const response = await sendRpcMessage({ 
     source: "calendar",
@@ -155,5 +162,68 @@ async function start() {
     console.log("🚀 API rodando em http://localhost:3000");
   });
 }
+
+
+// Rotas Timesheet
+
+// Buscar timesheet da semana
+app.post("/timesheet/read", async (req, res) => {
+  const response = await sendRpcMessage({
+    source: "timesheet",
+    action: "read",
+    data: req.body
+  });
+  res.json(response);
+});
+
+// Salvar lançamentos
+app.post("/timesheet/save", async (req, res) => {
+  const response = await sendRpcMessage({
+    source: "timesheet",
+    action: "save",
+    data: req.body
+  });
+  res.json(response);
+});
+
+// Enviar para aprovação
+app.post("/timesheet/submit", async (req, res) => {
+  const response = await sendRpcMessage({
+    source: "timesheet",
+    action: "submit",
+    data: req.body
+  });
+  res.json(response);
+});
+
+// Aprovar timesheet
+app.post("/timesheet/approve", async (req, res) => {
+  const response = await sendRpcMessage({
+    source: "timesheet",
+    action: "approve",
+    data: req.body
+  });
+  res.json(response);
+});
+
+// Rejeitar timesheet
+app.post("/timesheet/reject", async (req, res) => {
+  const response = await sendRpcMessage({
+    source: "timesheet",
+    action: "reject",
+    data: req.body
+  });
+  res.json(response);
+});
+
+// Listar pendentes
+app.get("/timesheet/pending", async (req, res) => {
+  const response = await sendRpcMessage({
+    source: "timesheet",
+    action: "list_pending",
+    data: {}
+  });
+  res.json(response);
+});
 
 start();

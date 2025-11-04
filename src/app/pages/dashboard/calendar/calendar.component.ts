@@ -42,15 +42,15 @@ export class CalendarComponent {
 };
 
   recursos: any[] = []; // Lista de usuários disponíveis
-  currentDate = new Date(); // 📅 Data atual usada para navegação mensal
-  days: any[] = [];         // 🗓️ Dias do mês com eventos agrupados
-  events: { [key: string]: any[] } = {}; // 📦 Eventos agrupados por data (YYYY-MM-DD)
+  currentDate = new Date(); //  Data atual usada para navegação mensal
+  days: any[] = [];         //  Dias do mês com eventos agrupados
+  events: { [key: string]: any[] } = {}; //  Eventos agrupados por data (YYYY-MM-DD)
 
-  tipo: string = '';        // 🔍 Tipo da agenda ('client' ou 'user')
-  id: number = 0;           // 🧾 ID do cliente ou usuário
+  tipo: string = '';        //  Tipo da agenda ('client' ou 'user')
+  id: number = 0;           //  ID do cliente ou usuário
   selectedDay: { day: number, events: any[] } | null = null; // 📌 Dia selecionado para exibir detalhes
-  newEvent: string = '';    // 📝 Título do novo evento
-
+  newEvent: string = '';    //  Título do novo evento
+  nomeAgenda: string = ''; 
   constructor(
     private route: ActivatedRoute,
     private calendarService: CalendarService,
@@ -61,26 +61,27 @@ export class CalendarComponent {
     // 🔄 Captura os parâmetros da rota
     this.tipo = this.route.snapshot.paramMap.get('tipo')!;
     this.id = +this.route.snapshot.paramMap.get('id')!;
+    this.nomeAgenda = sessionStorage.getItem('nameOrig') || 'Agenda';
     this.carregarAgenda(); // 🚀 Carrega os eventos da agenda
   }
 
   carregarAgenda() {
     this.calendarService.getAgenda(this.tipo, this.id).subscribe(agenda => {
-      this.events = {}; // 🔄 Reseta os eventos
+      this.events = {}; //  Reseta os eventos
 
       agenda.forEach(evento => {
         if (!evento.start_time) return;
         const dateKey = this.formatDateKey(evento.start_time);
 
         if (!this.events[dateKey]) this.events[dateKey] = [];
-        this.events[dateKey].push(evento); // ✅ Salva o objeto completo
+        this.events[dateKey].push(evento); //  Salva o objeto completo
       });
 
-      this.generateCalendar(); // 🧠 Gera os dias do mês com eventos
+      this.generateCalendar(); //  Gera os dias do mês com eventos
     });
     this.recursosService.getUsers().subscribe({
       next: (data) => {
-        this.recursos = data; // ✅ lista de usuários para seleção
+        this.recursos = data; //  lista de usuários para seleção
       },
       error: (err) => {
         console.error('Erro ao carregar recursos:', err);
@@ -167,17 +168,37 @@ export class CalendarComponent {
     });
 
     this.formEvento = { title: '', description: '', user_id: [] };
-}
+  }
+
+  concluirEvento(scheduleId: any) {
+    
+    scheduleId.status = scheduleId.status === 'completed' ? 'open' : 'completed';
+    
+    this.calendarService.completeAgenda(scheduleId).subscribe({
+      next: () => {
+        this.carregarAgenda(); // Atualiza visual
+      },
+      error: (err) => {
+        console.error('Erro ao concluir agenda:', err);
+      }
+    });
+  }
+
+  
 
 
   visualizarEvento(e: any) {
-    alert(`📋 Detalhes do evento:\nTítulo: ${e.title}\nData: ${e.start_time}\nLocal: ${e.location || 'N/A'}`);
+    alert(`📋 Detalhes do evento:
+      \nTítulo: ${e.title}
+      \nData: ${e.start_time}
+      \nStatus: ${e.status}
+      \nLocal: ${e.location || 'N/A'}`);
   }
 
-  concluirEvento(e: any) {
-    alert(`✅ Evento "${e.title}" marcado como concluído.`);
-    // Aqui você pode implementar lógica para atualizar status no backend
-  }
+  // concluirEvento(e: any) {
+  //   alert(`✅ Evento "${e.title}" marcado como concluído.`);
+  //   // Aqui você pode implementar lógica para atualizar status no backend
+  // }
 
   excluirEvento(e: any) {
   //   if (confirm(`🗑️ Deseja excluir o evento "${e.title}"?`)) {
@@ -186,6 +207,7 @@ export class CalendarComponent {
   //       error: (err) => console.error('Erro ao excluir evento:', err)
   //     });
   //   }
+  console.log(e)
    alert(`✅ Evento "${e.title}" marcado para deletar.`);
    }
 }

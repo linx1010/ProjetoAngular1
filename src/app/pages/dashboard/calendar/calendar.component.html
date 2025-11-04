@@ -1,3 +1,6 @@
+<div class="agenda-header">
+  <h2>Agenda de {{ nomeAgenda }}</h2>
+</div>
 <!-- 📅 Cabeçalho do calendário -->
 <div class="calendar-header">
   <button (click)="prevMonth()">◀</button>
@@ -12,8 +15,8 @@
       <strong>{{ d.day }}</strong>
 
       <!-- 📌 Eventos do dia -->
-      <div class="event" *ngFor="let e of d.events">
-        <strong>{{ e.title }}</strong>
+      <div class="event" *ngFor="let e of d.events"[ngClass]="{ 'concluido': e.status === 'completed' }">
+        <span>{{ e.title }}</span><br>
         <span *ngIf="e.location">📍 {{ e.location }}</span>
 
       </div>

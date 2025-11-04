@@ -128,6 +128,7 @@ export class ClientesComponent implements OnInit {
     });
   }
   abrirCalendario(client:Client):void{
+    sessionStorage.setItem('nameOrig',client.name)
     this.router.navigate(['/dashboard/calendar','client',client.id])
   }
 

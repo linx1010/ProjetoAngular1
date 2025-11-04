@@ -34,5 +34,9 @@ export class CalendarService {
       })
     );
   }
+  completeAgenda(scheduleId: any): Observable<any> {
+  return this.http.put<any>(this.apiUrl,  scheduleId );
+  }
+
 
 }

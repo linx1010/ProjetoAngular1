@@ -96,6 +96,9 @@
     <button mat-icon-button color="accent" (click)="atualizar(user)">
       <mat-icon>edit</mat-icon>
     </button>
+    <button mat-icon-button color="primary" (click)="abrirTimesheet(user)" matTooltip="Abrir Timesheet">
+      <mat-icon>schedule</mat-icon>
+    </button>
     <button mat-icon-button color="warn" (click)="inativar(user)">
       <mat-icon>{{ user.active ? 'person_off' : 'person' }}</mat-icon>
     </button>

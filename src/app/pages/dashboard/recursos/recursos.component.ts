@@ -184,6 +184,7 @@ export class RecursosComponent implements OnInit {
 
   abrirCalendario(user:User):void{
     console.log('/dashboard/calendar','user',user.id)
+    sessionStorage.setItem('nameOrig',user.name)
     this.router.navigate(['/dashboard/calendar','user',user.id])
   }
 
@@ -219,12 +220,22 @@ export class RecursosComponent implements OnInit {
   alerta() {
     alert('alerta');
   }
+  abrirTimesheet(user: User): void {
+  if (!user.active) {
+    alert('Usuário inativo não pode acessar timesheets.');
+  }
+
+  sessionStorage.setItem('timesheetUserName', user.name);
+  this.router.navigate(['/dashboard/timesheet', user.id]);
+}
   abrirCadastro() {
   const dialogRef = this.dialog.open(RecursosFormDialog, {
     panelClass: 'big-dialog',
     autoFocus: false,
     data: { name: '', email: '', role: '', active: true }
   });
+
+ 
 
   dialogRef.afterClosed().subscribe(result => {
     if (result) {

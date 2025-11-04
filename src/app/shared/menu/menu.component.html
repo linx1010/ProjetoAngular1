@@ -1,10 +1,10 @@
 <nav class="menu">
   <ul>
-    <li><a routerLink="/dashboard/recursos" routerLinkActive="active">Recursos</a></li>
-    <li><a routerLink="/dashboard/clientes" routerLinkActive="active">Clientes</a></li>
-    <li><a routerLink="/dashboard/projetos" routerLinkActive="active">Projetos</a></li>
-    <li><a routerLink="/dashboard/calendar" routerLinkActive="active">Calendário</a></li>
-
-    <li><button (click)="logout()">Sair</button></li>
+    <li><a routerLink="/dashboard/recursos" routerLinkActive="active"><span class="material-icons">group</span> Recursos</a></li>
+    <li><a routerLink="/dashboard/clientes" routerLinkActive="active"><span class="material-icons">person</span> Clientes</a></li>
+    <li><a routerLink="/dashboard/projetos" routerLinkActive="active"><span class="material-icons">folder</span> Projetos</a></li>
+    <li><a routerLink="/dashboard/timesheet" routerLinkActive="active"><span class="material-icons">schedule</span> Tarefas</a></li>
+    <!-- <li><a routerLink="/dashboard/calendar" routerLinkActive="active"><span class="material-icons">calendar_today</span> Calendário</a></li> -->
+    <li><button (click)="logout()" class="logout-btn"><span class="material-icons">logout</span> Sair</button></li>
   </ul>
 </nav>

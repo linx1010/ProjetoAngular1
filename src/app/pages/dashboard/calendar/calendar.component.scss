@@ -50,7 +50,7 @@
   strong {
     display: block;
     margin-bottom: 6px;
-    color: #333;
+    color: #0c0c0c;
   }
 
   .event {
@@ -197,4 +197,18 @@
   button.mat-icon-button {
     margin-right: 4px;
   }
+}
+.agenda-header {
+  margin-bottom: 16px;
+  
+  h2 {
+    text-align: center;
+    font-size: 1.8rem;
+    color: #1976d2;
+    font-weight: bold;
+  }
+}
+.concluido {
+  color: #ccc;
+  text-decoration: line-through;
 }
