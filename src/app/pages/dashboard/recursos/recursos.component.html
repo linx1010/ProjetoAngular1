@@ -7,7 +7,7 @@
 
 <!-- Campo de filtro + botão -->
 <div class="toolbar">
-  <button mat-icon-button color="primary" (click)="toggleCadastro()">
+  <button mat-icon-button color="primary" (click)="toggleCadastro()"*ngIf="isAdminOrManager">
     <mat-icon>person_add</mat-icon>
   </button>
 
@@ -18,7 +18,7 @@
 </div>
 
 <!-- Formulário de Cadastro Inline -->
-<div *ngIf="showCadastro" class="cadastro-container">
+<div *ngIf="showCadastro && isAdminOrManager" class="cadastro-container">
   <form #form="ngForm" (ngSubmit)="salvarCadastro()">
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Nome</mat-label>
@@ -90,16 +90,16 @@
     <button mat-icon-button color="primary" (click)="abrirCalendario(user)">
       <mat-icon>calendar_today</mat-icon>
     </button>
-    <button mat-icon-button color="accent" (click)="visualizar(user)">
+    <button mat-icon-button color="accent" (click)="visualizar(user)"*ngIf="isAdminOrManager">
       <mat-icon>search</mat-icon>
     </button>
-    <button mat-icon-button color="accent" (click)="atualizar(user)">
+    <button mat-icon-button color="accent" (click)="atualizar(user)"*ngIf="isAdminOrManager">
       <mat-icon>edit</mat-icon>
     </button>
     <button mat-icon-button color="primary" (click)="abrirTimesheet(user)" matTooltip="Abrir Timesheet">
       <mat-icon>schedule</mat-icon>
     </button>
-    <button mat-icon-button color="warn" (click)="inativar(user)">
+    <button mat-icon-button color="warn" (click)="inativar(user)"*ngIf="isAdminOrManager">
       <mat-icon>{{ user.active ? 'person_off' : 'person' }}</mat-icon>
     </button>
   </td>

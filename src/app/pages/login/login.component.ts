@@ -23,7 +23,16 @@ export class LoginComponent {
 
   login() {
     const { username, password } = this.form.value;
-    if (username === 'admin' && password === '') {
+    const users = [
+    { username: 'admin', password: '', role: 'admin' },
+    { username: 'manager', password: '', role: 'manager' },
+    { username: 'member', password: '', role: 'member' },
+    { username: 'finance', password: '', role: 'finance' }
+    ];
+    const user = users.find(u => u.username === username && u.password === password);
+
+    if (user) {
+      localStorage.setItem('userRole', user.role);
       this.router.navigate(['/dashboard']);
     } else {
       this.error = 'Usuário ou senha inválidos';

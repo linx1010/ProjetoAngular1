@@ -72,6 +72,7 @@ export class RecursosComponent implements OnInit {
   showCadastro = false; // controla se o form aparece
   
   error = '';
+  role: string | null = null;
   displayedColumns: string[] = [
     'id',
     'name',
@@ -154,6 +155,7 @@ export class RecursosComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.role = localStorage.getItem('userRole');
     this.loadUsers();
   }
 
@@ -172,6 +174,12 @@ export class RecursosComponent implements OnInit {
       }
     });
   }
+  get isAdminOrManager(): boolean {
+    return this.role === 'admin' || this.role === 'manager';
+  }
+  get isMember(): boolean {
+    return this.role === 'member';
+  }
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
@@ -189,6 +197,7 @@ export class RecursosComponent implements OnInit {
   }
 
   visualizar(user: User) {
+    if (!this.isAdminOrManager) return;
     this.dialog.open(RecursosDialog, {
       width: '600px',
       data: user,
@@ -200,12 +209,14 @@ export class RecursosComponent implements OnInit {
   }
 
   atualizar(user: User) {
+    if (!this.isAdminOrManager) return;
     this.editUser = user;            // guarda o usuário que será editado
     this.novoUser = { ...user };     // copia os dados para o formulário
     this.showCadastro = true;        // mostra o formulário
   }
 
   inativar(user: User) {
+    if (!this.isAdminOrManager) return;
     const atualizado = { ...user, active: user.active ? 0 : 1 }; // alterna o valor
     this.recursosService.updateUser(user.id, atualizado).subscribe({
       next: () => {
