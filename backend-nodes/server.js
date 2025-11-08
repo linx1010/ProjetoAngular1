@@ -152,18 +152,6 @@ app.delete("/calendar", async (req, res) => {
 });
 
 
-// Inicializa conexão RabbitMQ e servidor
-async function start() {
-  const conn = await amqp.connect(RABBITMQ_URL);
-  channel = await conn.createChannel();
-  console.log("✅ Conectado ao RabbitMQ");
-
-  app.listen(3000, () => {
-    console.log("🚀 API rodando em http://localhost:3000");
-  });
-}
-
-
 // Rotas Timesheet
 
 // Buscar timesheet da semana
@@ -225,5 +213,43 @@ app.get("/timesheet/pending", async (req, res) => {
   });
   res.json(response);
 });
+
+
+// Rota de login
+app.post("/api/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ status: false, message: "Email e senha são obrigatórios" });
+  }
+
+  try {
+    const response = await sendRpcMessage({
+      source: "users",
+      action: "login",
+      data: { email, password }
+    });
+
+    res.json(response);
+  } catch (err) {
+    console.error("Erro no login:", err);
+    res.status(500).json({ status: false, message: "Erro interno no servidor" });
+  }
+});
+
+
+
+
+
+// Inicializa conexão RabbitMQ e servidor
+async function start() {
+  const conn = await amqp.connect(RABBITMQ_URL);
+  channel = await conn.createChannel();
+  console.log("✅ Conectado ao RabbitMQ");
+
+  app.listen(3000, () => {
+    console.log("🚀 API rodando em http://localhost:3000");
+  });
+}
 
 start();
