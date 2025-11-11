@@ -11,7 +11,7 @@
     <mat-icon>person_add</mat-icon>
   </button>
 
-  <mat-form-field appearance="outline">
+  <mat-form-field >
     <mat-label>Filtro</mat-label>
     <input matInput class="filter" (keyup)="applyFilter($event)"  #input>
   </mat-form-field>
@@ -20,22 +20,55 @@
 <!-- Formulário de Cadastro Inline -->
 <div *ngIf="showCadastro && isAdminOrManager" class="cadastro-container">
   <form #form="ngForm" (ngSubmit)="salvarCadastro()">
-    <mat-form-field appearance="outline" class="full-width">
+    <mat-form-field  class="full-width">
       <mat-label>Nome</mat-label>
       <input matInput [(ngModel)]="novoUser.name" name="name" required>
     </mat-form-field>
 
-    <mat-form-field appearance="outline" class="full-width">
+    <mat-form-field  class="full-width">
       <mat-label>Email</mat-label>
       <input matInput [(ngModel)]="novoUser.email" name="email" required type="email">
     </mat-form-field>
 
-    <mat-form-field appearance="outline" class="full-width">
+    
+    <mat-form-field  class="full-width">
       <mat-label>Função</mat-label>
-      <input matInput [(ngModel)]="novoUser.role" name="role">
+      <mat-select [(ngModel)]="novoUser.role" name="role" required>
+        <mat-option [value]="null">Nenhuma</mat-option>
+        <mat-option *ngFor="let role of rolesPermitidas" [value]="role">
+          {{ role }}
+        </mat-option>
+      </mat-select>
     </mat-form-field>
 
-    <mat-form-field appearance="outline" class="full-width">
+    <mat-form-field  class="full-width">
+      <mat-label>Módulos</mat-label>
+      <mat-select [(ngModel)]="novoUser.modulos" name="modulos" multiple>
+        
+        <!-- Campo de filtro dentro do dropdown -->
+        <mat-option>
+          <input
+            matInput
+            placeholder="Filtrar módulos..."
+            [(ngModel)]="modulosFiltro"
+            (keyup)="filtrarModulos()"
+            style="width: 100%; padding: 4px;"
+          />
+        </mat-option>
+
+        <!-- Lista filtrada -->
+        <mat-option *ngFor="let modulo of modulosFiltrados" [value]="modulo.code">
+          {{ modulo.code }}: {{ modulo.label }}
+        </mat-option>
+
+      </mat-select>
+    </mat-form-field>
+
+
+  
+
+
+    <mat-form-field  class="full-width">
       <mat-label>Valor-Hora</mat-label>
       <input matInput [(ngModel)]="novoUser.hourly_rate" name="hourly_rate" type="number">
     </mat-form-field>

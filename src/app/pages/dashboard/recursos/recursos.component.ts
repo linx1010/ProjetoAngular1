@@ -9,9 +9,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, FormControl } from '@angular/forms';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle'; // para o toggle
 import { Router } from '@angular/router';
+import { MatSelectModule, MatOption, MatSelect } from '@angular/material/select';
 
 
 // ⭐ Mini componente do Dialog
@@ -36,7 +37,8 @@ export class RecursosDialog {
     MatButtonModule,
     MatIconModule,
     FormsModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    MatSelectModule
   ]
 })
 export class RecursosFormDialog {
@@ -50,17 +52,19 @@ export class RecursosFormDialog {
   selector: 'app-recursos',
   standalone: true,
   imports: [
-    CommonModule, 
+    CommonModule,
     HttpClientModule,
-    MatFormFieldModule, 
-    MatInputModule, 
+    MatFormFieldModule,
+    MatInputModule,
     MatTableModule,
     MatIconModule,
     MatButtonModule,
     FormsModule,
-    MatDialogModule // necessário para abrir dialogs
-
-  ], 
+    
+    MatDialogModule,
+    MatOption,
+    MatSelect
+], 
   templateUrl: './recursos.component.html', // 👈 mantém o seu HTML principal
   styleUrls: ['./recursos.component.scss']
 })
@@ -73,6 +77,63 @@ export class RecursosComponent implements OnInit {
   
   error = '';
   role: string | null = null;
+  selected = '';
+  // roles permitidas
+  rolesPermitidas: string[] = ['admin', 'manager', 'member', 'contractor'];
+  modules = new FormControl('');
+  moduleList = [
+    {code:'SIGAATF',label:'Ativo fixo'},
+    {code:'SIGACOM',label:'Compras'},
+    {code:'SIGAEST',label:'Estoque e Custos'},
+    {code:'SIGAFAT',label:'Faturamento'},
+    {code:'SIGAFIN',label:'Financeiro'},
+    {code:'SIGAFIS',label:'Livros Fiscais'},
+    {code:'SIGAPCP',label:'Planejamento e controle de produção'},
+    {code:'SIGALOJA',label:'Operações de PDV e retaguarda'},
+    {code:'SIGATMK',label:'Telemarketing, Televendas e Telecobrança'},
+    {code:'SIGAPON',label:'Ponto eletrônico'},
+    {code:'SIGATCF',label:'Terminal de Consulta do Funcionário'},
+    {code:'SIGARSP',label:'Recrutamento e Seleção Pessoal'},
+    {code:'SIGAQIE',label:'Inspeção de Entradas'},
+    {code:'SIGAQMT',label:'Metrologia (laboratório)'},
+    {code:'SIGAFRT',label:'Front Loja'},
+    {code:'SIGAQDO',label:'Controle de documentos'},
+    {code:'SIGAQIP',label:'Inspeção de Processos'},
+    {code:'SIGATRM',label:'Treinamento'},
+    {code:'SIGATEC',label:'Gestão de Serviços'},
+    {code:'SIGAPLS',label:'Plano de Saúde'},
+    {code:'SIGACTB',label:'Contabilidade Gerencial'},
+    {code:'SIGAQNC',label:'Controle de Não-Conformidades'},
+    {code:'SIGAQAD',label:'Controlar de Auditoria'},
+    {code:'SIGAOMS',label:'OMS – Gestão de Distribuição'},
+    {code:'SIGACSA',label:'Cargos e Salários'},
+    {code:'SIGAWMS',label:'Gestão de Armazéns'},
+    {code:'SIGATMS',label:'Gestão de Transportes'},
+    {code:'SIGAPMS',label:'Gestão de Projetos'},
+    {code:'SIGACDA',label:'Controle de Direitos Autorais'},
+    {code:'SIGAACD',label:'Automação e Coleta de Dados'},
+    {code:'SIGAPPAP',label:'Processo de Aprovação de Peças de Produção (PPAP)'},
+    {code:'SIGAAPD',label:'Avaliação e Pesquisa de Desempenho'},
+    {code:'SIGAPCO',label:'Planejamento e Controle Orçamentário'},
+    {code:'SIGAAPT',label:'Acompanhamento de processos trabalhistas'},
+    {code:'SIGAAGR',label:'Gestão Agrícola'},
+    {code:'SIGAGCT',label:'Gestão de Contratos'},
+    {code:'SIGAORG',label:'Arquitetura organizacional'},
+    {code:'SIGACRM',label:'Customer Relationship Management (CRM)'},
+    {code:'SIGAJURI',label:'Gestão de Assuntos Jurídicos'},
+    {code:'SIGAPFS',label:'Pré faturamento de Serviço'},
+    {code:'TOTVSGFE',label:'Frete Embarcador'},
+    {code:'TOTVSSFC',label:'Chão de Fábrica'},
+    {code:'SIGADPR',label:'Desenvolvedor de Produtos'},
+    {code:'SIGATAF',label:'TOTVS Automação Fiscal'},
+    {code:'SIGAGCP',label:'Gestão de Compras Públicas'},
+    {code:'SIGAGTP',label:'Gestão de transporte de passageiro'},
+    {code:'SIGACFG',label:'Configurador'},
+    {code:'SIGAEIC',label:'Comércio Exterior'}
+  ];
+  
+
+
   displayedColumns: string[] = [
     'id',
     'name',
@@ -81,16 +142,25 @@ export class RecursosComponent implements OnInit {
     'active',
     'actions'
   ];
+  modulosFiltrados = [...this.moduleList];
+  modulosFiltro: string = '';
+  
   novoUser: any = {
     name: '',
     email: '',
     role: '',
     hourly_rate: null,
     organization_id:'1',
-    active: true
+    active: true,
+    modulos:[] as string[]
   };
   
-
+  filtrarModulos() {
+  const filtro = this.modulosFiltro.toLowerCase();
+  this.modulosFiltrados = this.moduleList.filter(m =>
+    m.code.toLowerCase().includes(filtro) || m.label.toLowerCase().includes(filtro)
+  );
+}
   toggleCadastro() {
     this.showCadastro = !this.showCadastro;
     if (!this.showCadastro) {
