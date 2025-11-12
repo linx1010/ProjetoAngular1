@@ -13,6 +13,7 @@ import { FormsModule, FormControl } from '@angular/forms';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle'; // para o toggle
 import { Router } from '@angular/router';
 import { MatSelectModule, MatOption, MatSelect } from '@angular/material/select';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 
 // ⭐ Mini componente do Dialog
@@ -38,7 +39,8 @@ export class RecursosDialog {
     MatIconModule,
     FormsModule,
     MatSlideToggleModule,
-    MatSelectModule
+    MatSelectModule,
+    MatTooltipModule
   ]
 })
 export class RecursosFormDialog {
@@ -60,7 +62,7 @@ export class RecursosFormDialog {
     MatIconModule,
     MatButtonModule,
     FormsModule,
-    
+    MatTooltipModule,
     MatDialogModule,
     MatOption,
     MatSelect
@@ -83,53 +85,7 @@ export class RecursosComponent implements OnInit {
   modules = new FormControl('');
   moduleList = [
     {code:'SIGAATF',label:'Ativo fixo'},
-    {code:'SIGACOM',label:'Compras'},
-    {code:'SIGAEST',label:'Estoque e Custos'},
-    {code:'SIGAFAT',label:'Faturamento'},
-    {code:'SIGAFIN',label:'Financeiro'},
-    {code:'SIGAFIS',label:'Livros Fiscais'},
-    {code:'SIGAPCP',label:'Planejamento e controle de produção'},
-    {code:'SIGALOJA',label:'Operações de PDV e retaguarda'},
-    {code:'SIGATMK',label:'Telemarketing, Televendas e Telecobrança'},
-    {code:'SIGAPON',label:'Ponto eletrônico'},
-    {code:'SIGATCF',label:'Terminal de Consulta do Funcionário'},
-    {code:'SIGARSP',label:'Recrutamento e Seleção Pessoal'},
-    {code:'SIGAQIE',label:'Inspeção de Entradas'},
-    {code:'SIGAQMT',label:'Metrologia (laboratório)'},
-    {code:'SIGAFRT',label:'Front Loja'},
-    {code:'SIGAQDO',label:'Controle de documentos'},
-    {code:'SIGAQIP',label:'Inspeção de Processos'},
-    {code:'SIGATRM',label:'Treinamento'},
-    {code:'SIGATEC',label:'Gestão de Serviços'},
-    {code:'SIGAPLS',label:'Plano de Saúde'},
-    {code:'SIGACTB',label:'Contabilidade Gerencial'},
-    {code:'SIGAQNC',label:'Controle de Não-Conformidades'},
-    {code:'SIGAQAD',label:'Controlar de Auditoria'},
-    {code:'SIGAOMS',label:'OMS – Gestão de Distribuição'},
-    {code:'SIGACSA',label:'Cargos e Salários'},
-    {code:'SIGAWMS',label:'Gestão de Armazéns'},
-    {code:'SIGATMS',label:'Gestão de Transportes'},
-    {code:'SIGAPMS',label:'Gestão de Projetos'},
-    {code:'SIGACDA',label:'Controle de Direitos Autorais'},
-    {code:'SIGAACD',label:'Automação e Coleta de Dados'},
-    {code:'SIGAPPAP',label:'Processo de Aprovação de Peças de Produção (PPAP)'},
-    {code:'SIGAAPD',label:'Avaliação e Pesquisa de Desempenho'},
-    {code:'SIGAPCO',label:'Planejamento e Controle Orçamentário'},
-    {code:'SIGAAPT',label:'Acompanhamento de processos trabalhistas'},
-    {code:'SIGAAGR',label:'Gestão Agrícola'},
-    {code:'SIGAGCT',label:'Gestão de Contratos'},
-    {code:'SIGAORG',label:'Arquitetura organizacional'},
-    {code:'SIGACRM',label:'Customer Relationship Management (CRM)'},
-    {code:'SIGAJURI',label:'Gestão de Assuntos Jurídicos'},
-    {code:'SIGAPFS',label:'Pré faturamento de Serviço'},
-    {code:'TOTVSGFE',label:'Frete Embarcador'},
-    {code:'TOTVSSFC',label:'Chão de Fábrica'},
-    {code:'SIGADPR',label:'Desenvolvedor de Produtos'},
-    {code:'SIGATAF',label:'TOTVS Automação Fiscal'},
-    {code:'SIGAGCP',label:'Gestão de Compras Públicas'},
-    {code:'SIGAGTP',label:'Gestão de transporte de passageiro'},
-    {code:'SIGACFG',label:'Configurador'},
-    {code:'SIGAEIC',label:'Comércio Exterior'}
+    {code:'SIGACOM',label:'Compras'}
   ];
   
 
@@ -152,15 +108,16 @@ export class RecursosComponent implements OnInit {
     hourly_rate: null,
     organization_id:'1',
     active: true,
-    modulos:[] as string[]
+    modulos: [] as { code: string, proficiency: number }[]
   };
   
   filtrarModulos() {
-  const filtro = this.modulosFiltro.toLowerCase();
-  this.modulosFiltrados = this.moduleList.filter(m =>
-    m.code.toLowerCase().includes(filtro) || m.label.toLowerCase().includes(filtro)
-  );
-}
+    const filtro = this.modulosFiltro.toLowerCase();
+    this.modulosFiltrados = this.moduleList.filter(m =>
+      m.code.toLowerCase().includes(filtro) || m.label.toLowerCase().includes(filtro)
+    );
+  }
+
   toggleCadastro() {
     this.showCadastro = !this.showCadastro;
     if (!this.showCadastro) {
@@ -226,7 +183,13 @@ export class RecursosComponent implements OnInit {
 
   ngOnInit() {
     this.role = localStorage.getItem('userRole');
-    this.loadUsers();
+    const userId = Number(localStorage.getItem('userId'));
+    if (this.role === 'member') {
+      this.loadUserById(userId);   // só carrega o próprio usuário
+      } else {
+        this.loadUsers();            // carrega todos
+      }
+    this.loadModules();
   }
 
   loadUsers() {
@@ -244,6 +207,43 @@ export class RecursosComponent implements OnInit {
       }
     });
   }
+  
+  loadUserById(id: number) {
+    this.loading = true;
+    this.recursosService.getUserById(id).subscribe({
+      next: (user) => {
+        this.users = [user];
+        this.dataSource.data = [user];
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error(err);
+        this.error = 'Erro ao carregar usuário';
+        this.loading = false;
+      }
+    });
+  }
+
+
+  loadModules() {
+    this.recursosService.getModules().subscribe({
+      next: (data) => {
+        // popula lista completa
+        this.moduleList = data.map(m => ({
+          code: m.code,
+          label: m.label
+        }));
+
+        // ✅ atualiza lista filtrada também
+        this.modulosFiltrados = [...this.moduleList];
+      },
+      error: (err) => {
+        console.error('Erro ao carregar módulos', err);
+      }
+    });
+  }
+
+
   get isAdminOrManager(): boolean {
     return this.role === 'admin' || this.role === 'manager';
   }
@@ -256,9 +256,6 @@ export class RecursosComponent implements OnInit {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
-  // abrirCalendario(user: User) {
-  //   console.log('Abrir calendário para:', user);
-  // }
 
   abrirCalendario(user:User):void{
     console.log('/dashboard/calendar','user',user.id)

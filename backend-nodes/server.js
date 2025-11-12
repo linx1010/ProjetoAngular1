@@ -46,6 +46,16 @@ app.get("/users", async (req, res) => {
   res.json(response);
 });
 
+app.get("/users/:id", async (req, res) => {
+  const response = await sendRpcMessage({
+    source: "users",
+    action: "read_by_id",
+    data: { id: parseInt(req.params.id) }
+  });
+  res.json(response);
+});
+
+
 app.post("/users", async (req, res) => {
   const response = await sendRpcMessage({ 
     source: "users",
@@ -235,6 +245,16 @@ app.post("/api/login", async (req, res) => {
     console.error("Erro no login:", err);
     res.status(500).json({ status: false, message: "Erro interno no servidor" });
   }
+});
+
+
+//Rotas Módulos
+app.get("/modules", async (req, res) => {
+  const response = await sendRpcMessage({
+    source: "modules",
+    action: "read"
+  });
+  res.json(response);
 });
 
 

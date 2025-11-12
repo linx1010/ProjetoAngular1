@@ -51,10 +51,12 @@
             matInput
             placeholder="Filtrar módulos..."
             [(ngModel)]="modulosFiltro"
+            [ngModelOptions]="{standalone: true}"
             (keyup)="filtrarModulos()"
             style="width: 100%; padding: 4px;"
           />
         </mat-option>
+
 
         <!-- Lista filtrada -->
         <mat-option *ngFor="let modulo of modulosFiltrados" [value]="modulo.code">
@@ -120,19 +122,19 @@
 <ng-container matColumnDef="actions">
   <th mat-header-cell *matHeaderCellDef> Ações </th>
   <td mat-cell *matCellDef="let user" class="actions-cell">
-    <button mat-icon-button color="primary" (click)="abrirCalendario(user)">
+    <button mat-icon-button color="primary" (click)="abrirCalendario(user)" matTooltip="Abrir calendário">
       <mat-icon>calendar_today</mat-icon>
     </button>
-    <button mat-icon-button color="accent" (click)="visualizar(user)"*ngIf="isAdminOrManager">
+    <button mat-icon-button color="accent" (click)="visualizar(user)"*ngIf="isAdminOrManager" matTooltip="Detalhes">
       <mat-icon>search</mat-icon>
     </button>
-    <button mat-icon-button color="accent" (click)="atualizar(user)"*ngIf="isAdminOrManager">
+    <button mat-icon-button color="accent" (click)="atualizar(user)"*ngIf="isAdminOrManager" matTooltip="Editar">
       <mat-icon>edit</mat-icon>
     </button>
     <button mat-icon-button color="primary" (click)="abrirTimesheet(user)" matTooltip="Abrir Timesheet">
       <mat-icon>schedule</mat-icon>
     </button>
-    <button mat-icon-button color="warn" (click)="inativar(user)"*ngIf="isAdminOrManager">
+    <button mat-icon-button color="warn" (click)="inativar(user)"*ngIf="isAdminOrManager" matTooltip="Ativar/Desativar">
       <mat-icon>{{ user.active ? 'person_off' : 'person' }}</mat-icon>
     </button>
   </td>

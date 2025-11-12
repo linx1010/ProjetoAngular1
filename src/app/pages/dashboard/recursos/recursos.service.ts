@@ -14,32 +14,50 @@ export interface User {
   updated_at: string;
 }
 
+export interface Module {
+  code: string;
+  organization_id: number;
+  label: string;
+  description: string;
+  active: number;
+  created_at: string;
+  updated_at: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class RecursosService {
 
-  private apiUrl = 'http://localhost:3000/users';
+  private apiUrlUsers = 'http://localhost:3000/users';
+  private apiUrlModules = 'http://localhost:3000/modules';
 
   constructor(private http: HttpClient) {}
 
-  // GET all users
+  // ---------------- USERS ----------------
   getUsers(): Observable<User[]> {
-    return this.http.get<User[]>(this.apiUrl);
+    return this.http.get<User[]>(this.apiUrlUsers);
+  }
+  
+  getUserById(id:number): Observable<User> {
+    return this.http.get<User>(`${this.apiUrlUsers}/${id}`);
   }
 
-  // CREATE a new user
+
   createUser(user: Partial<User>): Observable<User> {
-    return this.http.post<User>(this.apiUrl, user);
+    return this.http.post<User>(this.apiUrlUsers, user);
   }
 
-  // UPDATE an existing user
   updateUser(id: number, user: Partial<User>): Observable<User> {
-    return this.http.put<User>(`${this.apiUrl}/${id}`, user);
+    return this.http.put<User>(`${this.apiUrlUsers}/${id}`, user);
   }
 
-  // DELETE a user (opcional)
   deleteUser(id: number): Observable<User> {
-    return this.http.delete<User>(`${this.apiUrl}/${id}`);
+    return this.http.delete<User>(`${this.apiUrlUsers}/${id}`);
+  }
+
+  // ---------------- MODULES ----------------
+  getModules(): Observable<Module[]> {
+    return this.http.get<Module[]>(this.apiUrlModules);
   }
 }
